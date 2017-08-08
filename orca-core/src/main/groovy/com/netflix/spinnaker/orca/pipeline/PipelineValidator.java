@@ -30,6 +30,13 @@ public interface PipelineValidator {
    */
   void checkRunnable(Pipeline pipeline);
 
+  /**
+   * Determines if a pipeline should be queued.
+   *
+   * @throws PipelineValidationFailed if the pipeline cannot be queued.
+   */
+  void checkShouldQueue(Pipeline pipeline);
+
   abstract class PipelineValidationFailed extends ValidationException {
     public PipelineValidationFailed(String message) {
       super(message, Collections.emptyList());

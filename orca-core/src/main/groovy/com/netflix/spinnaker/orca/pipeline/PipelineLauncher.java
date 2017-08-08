@@ -76,6 +76,13 @@ public class PipelineLauncher extends ExecutionLauncher<Pipeline> {
     if (execution.getPipelineConfigId() == null || !execution.isLimitConcurrent()) {
       return false;
     }
+    // TODO(jacobkiefer): START EXPERIMENT
+    Map<String, Object> triggerMap = execution.getTrigger();
+    triggerMap.put("messageHash", "B");
+    persistExecution(execution);
+    // TODO(jacobkiefer): END EXPERIMENT
+
+    checkShouldQueue(execution);
     return startTracker
       .map(tracker ->
         tracker.queueIfNotStarted(execution.getPipelineConfigId(), execution.getId()))
@@ -91,6 +98,10 @@ public class PipelineLauncher extends ExecutionLauncher<Pipeline> {
 
   @Override protected void checkRunnable(Pipeline execution) {
     pipelineValidator.ifPresent(it -> it.checkRunnable(execution));
+  }
+
+  private void checkShouldQueue(Pipeline execution) {
+    pipelineValidator.ifPresent(it -> it.checkShouldQueue(execution));
   }
 
   @Override
