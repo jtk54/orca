@@ -74,9 +74,11 @@ public class SavePipelineTask implements RetryableTask {
     log.info("Expanded encoded pipeline:" + new String(pipelineData));
 
     Map<String, Object> pipeline = (Map<String, Object>) stage.decodeBase64("/pipeline", Map.class);
+    log.info("Decoded pipeline Map: {}", pipeline);
 
     pipelineModelMutators.stream().filter(m -> m.supports(pipeline)).forEach(m -> m.mutate(pipeline));
 
+    log.info("Decoded pipeline Map after mutation: {}", pipeline);
     Response response = front50Service.savePipeline(pipeline);
 
     Map<String, Object> outputs = new HashMap<>();
