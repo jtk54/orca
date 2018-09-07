@@ -81,7 +81,7 @@ class GceDeployStagePreProcessor implements DeployStagePreProcessor  {
   List<StageDefinition> afterStageDefinitions(Stage stage) {
     def stageData = stage.mapTo(StageData)
     def stageDefinitions = []
-    if (stageData.strategy != "rollingredblack") {
+    if (stageData.useSourceCapacity && stageData.strategy != "rollingredblack") {
       // rolling red/black has no need to apply a snapshotted capacity (on the newly created server group)
       stageDefinitions << new StageDefinition(
         name: "restoreMinCapacityFromSnapshot",
@@ -131,13 +131,16 @@ class GceDeployStagePreProcessor implements DeployStagePreProcessor  {
       cloudProvider                          : cleanupConfig.cloudProvider,
     ]
 
-    def source = getSource(targetServerGroupResolver, stageData, baseContext)
-    baseContext.putAll([
-      serverGroupName   : source.serverGroupName,
-      action            : ResizeStrategy.ResizeAction.scale_to_server_group,
-      source            : source,
-      useNameAsLabel    : true     // hint to deck that it should _not_ override the name
-    ])
+    if (stageData.useSourceCapacity) {
+      println ",, using source capacity, should scale up"
+      def source = getSource(targetServerGroupResolver, stageData, baseContext)
+      baseContext.putAll([
+        serverGroupName   : source.serverGroupName,
+        action            : ResizeStrategy.ResizeAction.scale_to_server_group,
+        source            : source,
+        useNameAsLabel    : true     // hint to deck that it should _not_ override the name
+      ])
+    }
     return baseContext
   }
 

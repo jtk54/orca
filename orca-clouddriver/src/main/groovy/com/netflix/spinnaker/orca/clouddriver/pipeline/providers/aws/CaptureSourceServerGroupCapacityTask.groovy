@@ -40,6 +40,7 @@ class CaptureSourceServerGroupCapacityTask implements Task {
     def stageOutputs = [:]
     StageData stageData = stage.mapTo(StageData)
     if (stageData.useSourceCapacity) {
+      println ",, capturing source group capacity"
       if (!stageData.source && stageData.preferSourceCapacity) {
         stageData.setUseSourceCapacity(false)
         stageOutputs = [
@@ -71,6 +72,7 @@ class CaptureSourceServerGroupCapacityTask implements Task {
         }
       }
     }
+    println ",, capture stage outputs: ${stageOutputs}"
 
     return new TaskResult(ExecutionStatus.SUCCEEDED, stageOutputs)
   }

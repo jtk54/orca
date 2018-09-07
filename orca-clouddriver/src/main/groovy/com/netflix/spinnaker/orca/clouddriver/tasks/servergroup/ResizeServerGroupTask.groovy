@@ -74,9 +74,12 @@ class ResizeServerGroupTask extends AbstractServerGroupTask {
       throw new IllegalStateException("$resizeConfig.actualAction not implemented")
     }
 
+
     ResizeStrategy.CapacitySet capacitySet = strategy.capacityForOperation(
       stage, account, serverGroupName, cloudProvider, location, resizeConfig
     )
+    println ",, resize strategy: ${strategy}"
+    println ",, capacitySet: ${capacitySet}"
     operation.capacity = [
       min: capacitySet.target.min,
       desired: capacitySet.target.desired,
