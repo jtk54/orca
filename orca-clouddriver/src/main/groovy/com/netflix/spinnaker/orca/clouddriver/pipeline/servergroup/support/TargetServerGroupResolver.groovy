@@ -62,6 +62,7 @@ class TargetServerGroupResolver {
   }
 
   private TargetServerGroup resolveByTarget(TargetServerGroup.Params params, Location location) {
+    log.info(",, params: ${params}")
     try {
       Map tsgMap = fetchWithRetries(Map) {
         oortService.getTargetServerGroup(params.app,

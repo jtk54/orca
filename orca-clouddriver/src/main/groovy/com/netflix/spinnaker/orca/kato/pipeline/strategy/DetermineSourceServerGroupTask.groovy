@@ -16,7 +16,7 @@
 
 package com.netflix.spinnaker.orca.kato.pipeline.strategy
 
-import java.util.concurrent.TimeUnit
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.netflix.spinnaker.orca.ExecutionStatus
 import com.netflix.spinnaker.orca.RetryableTask
 import com.netflix.spinnaker.orca.TaskResult
@@ -26,7 +26,8 @@ import com.netflix.spinnaker.orca.pipeline.model.Stage
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
-import retrofit.RetrofitError
+
+import java.util.concurrent.TimeUnit
 
 @Component
 @Slf4j
@@ -44,6 +45,9 @@ class DetermineSourceServerGroupTask implements RetryableTask {
   @Autowired
   SourceResolver sourceResolver
 
+  @Autowired
+  ObjectMapper objectMapper
+
   @Override
   TaskResult execute(Stage stage) {
     def stageData = stage.mapTo(StageData)
@@ -53,7 +57,10 @@ class DetermineSourceServerGroupTask implements RetryableTask {
     }
     Exception lastException = null
     try {
+      log.info(",, determine source SG task stage context: ${stage.getContext()}")
+      log.info(",, determine source SG task stage data map: ${objectMapper.convertValue(stageData, Map)}")
       def source = sourceResolver.getSource(stage)
+      log.info(",, source?: ${source}")
       Boolean useSourceCapacity = useSourceCapacity(stage, source)
       if (useSourceCapacity && !source) {
         isNotFound = true
